@@ -1,31 +1,18 @@
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.util.Stack;
 
-public class BrowserNavigatorRealSites {
+public class BrowserNavigationProject {
     private Stack<String> backStack = new Stack<>();
     private Stack<String> forwardStack = new Stack<>();
-    private String currentPage = "https://www.google.com"; 
-
-    public void openPage(String url) {
-        try {
-            Desktop.getDesktop().browse(new URI(url));
-        } catch (IOException | URISyntaxException e) {
-            System.out.println("Failed to open: " + url);
-        }
-    }
+    private String currentPage = "Home";
 
     public void visit(String url) {
-        if (!currentPage.isEmpty()) {
+        if (currentPage != null) {
             backStack.push(currentPage);
         }
         currentPage = url;
         forwardStack.clear();
-        System.out.println("Visiting: " + currentPage);
-        openPage(currentPage);
+        System.out.println("Visited: " + currentPage);
     }
 
     public void goBack() {
@@ -35,8 +22,7 @@ public class BrowserNavigatorRealSites {
         }
         forwardStack.push(currentPage);
         currentPage = backStack.pop();
-        System.out.println("Going back to: " + currentPage);
-        openPage(currentPage);
+        System.out.println("Back to: " + currentPage);
     }
 
     public void goForward() {
@@ -46,30 +32,31 @@ public class BrowserNavigatorRealSites {
         }
         backStack.push(currentPage);
         currentPage = forwardStack.pop();
-        System.out.println("Going forward to: " + currentPage);
-        openPage(currentPage);
+        System.out.println("Forward to: " + currentPage);
     }
 
-    
     public void showCurrentPage() {
         System.out.println("Current Page: " + currentPage);
     }
 
+    public void showHistory() {
+        System.out.println("Back History: " + backStack);
+        System.out.println("Forward History: " + forwardStack);
+    }
+
     public static void main(String[] args) {
-        BrowserNavigatorRealSites browser = new BrowserNavigatorRealSites();
+        BrowserNavigationProject browser = new BrowserNavigationProject();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("=== Real Site Browser Navigation ===");
-        System.out.println("Commands: visit <url>, back, forward, current, exit");
-
-        browser.openPage(browser.currentPage); 
+        System.out.println("=== Browser Navigation Simulator ===");
+        System.out.println("Commands: visit <url>, back, forward, current, history, exit");
 
         while (true) {
             System.out.print("\n> ");
             String input = scanner.nextLine().trim();
 
             if (input.equalsIgnoreCase("exit")) {
-                System.out.println("Exiting browser.");
+                System.out.println("Exiting browser...");
                 break;
             } else if (input.equalsIgnoreCase("back")) {
                 browser.goBack();
@@ -77,14 +64,17 @@ public class BrowserNavigatorRealSites {
                 browser.goForward();
             } else if (input.equalsIgnoreCase("current")) {
                 browser.showCurrentPage();
+            } else if (input.equalsIgnoreCase("history")) {
+                browser.showHistory();
             } else if (input.toLowerCase().startsWith("visit ")) {
                 String url = input.substring(6).trim();
-                if (!url.startsWith("http")) {
-                    url = "https://" + url;
+                if (!url.isEmpty()) {
+                    browser.visit(url);
+                } else {
+                    System.out.println("Please provide a valid URL.");
                 }
-                browser.visit(url);
             } else {
-                System.out.println("Invalid command.");
+                System.out.println("Unknown command.");
             }
         }
 
